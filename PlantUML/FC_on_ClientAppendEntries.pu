@@ -1,0 +1,15 @@
+@startuml
+start
+:反序列化消息;
+
+if (是否有LeaderID?) then (yes)
+    :获取Leader地址;
+    :获取客户端地址;
+    :构建重定向消息;
+    :发送重定向消息;
+    stop
+else (no)
+    :不做处理;
+    stop
+endif
+@enduml

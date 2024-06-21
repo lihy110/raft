@@ -1,0 +1,25 @@
+@startuml
+start
+:接收选举请求消息;
+:解析消息;
+
+if (请求任期 > 当前任期) then (是)
+    :更新当前任期;
+    :获取最后日志索引和任期;
+
+    if (请求日志新于本地日志) then (是)
+        :切换到Follower状态;
+        :为候选人投票;
+        :构建投票响应消息;
+        :发送响应给候选人;
+        :记录投票行为;
+        stop
+    else (否)
+        :切换到Follower状态;
+        stop
+    endif
+else (否)
+    :拒绝请求;
+    stop
+endif
+@enduml

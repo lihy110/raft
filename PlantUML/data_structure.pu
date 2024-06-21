@@ -1,0 +1,82 @@
+@startuml
+
+class Node {
+    - config: Configuration
+    - port: int
+    - host: string
+    - user_ID: int
+    - name: string
+    - currentTerm: int
+    - commitIndex: int
+    - lastApplied: int
+    - Entries: list
+    - other_peers: list
+    - server: Server
+    - timer: Timer
+    - state: State
+    + configure(config)
+    + start_state_handling()
+    + timeout()
+    + apply_commits(commitIndex: None)
+    + get_lastLogs_info(n: 1)
+    + get_log_term(index)
+    + get_address(Id)
+    + get_log_data(index)
+}
+
+class State {
+    - node: Node
+    + __init__(node: Node)
+    + handle(msg)
+}
+
+class Follower {
+    - leaderId: int
+    - voteFor: int
+    + __init__(node: Node, voteFor: int, leaderId: int)
+    + timeout()
+    + switch_to_candidate(leaderId)
+    + on_ElectRequest(msg)
+    + on_AppendEntries(msg)
+    + on_ClientRequest(msg)
+    + on_ClientAppendEntries(msg)
+}
+
+class Candidate {
+    - votes: int
+    - voteFor: int
+    - leaderId: int
+    + __init__(node: Node, leaderId: int)
+    + timeout()
+    + switch_to_leader()
+    + switch_to_Follower(voteFor = None, leaderId = None)
+    + Elect()
+    + on_ElectResponse(msg)
+    + on_AppendEntries(msg)
+    + on_ElectRequest(msg)
+    + on_ClientRequest(msg)
+    + on_ClientAppendEntries(msg)
+}
+
+class Leader {
+    - nextIndex: list
+    - matchIndex: list
+    + __init__(node: Node)
+    + timeout()
+    + find_nextIndex(node_ID, Index: None)
+    + find_matchIndex(node_ID, Index: None)
+    + switch_to_Follower(candidateId: None)
+    + judge_commitIndex()
+    + AppendEntries(data: None)
+    + on_AppendEntriesResponse(msg)
+    + on_ElectRequest(msg)
+    + on_ClientRequest(msg)
+    + on_ClientAppendEntries(msg)
+}
+
+Node "1" *-- "1" State : contains
+State <|-- Follower : extends
+State <|-- Candidate : extends
+State <|-- Leader : extends
+
+@enduml

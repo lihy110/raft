@@ -1,0 +1,28 @@
+@startuml
+start
+:接收到日志追加响应消息;
+:解析消息;
+
+if (追加是否成功) then (否)
+    :计算nextIndex (Index - 1);
+    :获取对应日志的任期和数据;
+    :构建日志追加消息;
+    :获取响应节点的地址;
+    :发送消息到对应节点;
+else (是)
+    :更新matchIndex;
+    :更新nextIndex;
+    
+    if (lastLogIndex < 本地日志长度) then (是)
+        :获取响应节点的地址;
+        :查询nextIndex;
+        :获取对应日志的任期和数据;
+        :构建并发送日志追加消息;
+    else (否)
+        :判断是否有超过一半节点同步;
+        :如果是，更新commitIndex并应用日志;
+    endif
+endif
+
+stop
+@enduml

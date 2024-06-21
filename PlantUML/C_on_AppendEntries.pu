@@ -1,0 +1,15 @@
+@startuml
+start
+:接收追加日志消息;
+:解析消息;
+
+if (请求的任期 >= 当前任期?) then (是)
+    :更新当前任期;
+    :切换到Follower状态;
+    :返回True;
+else (否)
+    :返回False;
+endif
+
+stop
+@enduml

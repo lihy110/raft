@@ -1,0 +1,16 @@
+@startuml
+start
+:接收客户端日志追加消息;
+:解析消息;
+
+:调用AppendEntries方法处理日志追加;
+if (追加成功?) then (是)
+    :获取客户端地址信息;
+    :构建成功响应消息;
+    :发送响应消息给客户端;
+else (否)
+    :不执行任何操作;
+endif
+
+stop
+@enduml

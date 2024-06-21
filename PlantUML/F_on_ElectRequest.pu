@@ -1,0 +1,29 @@
+@startuml
+start
+:接收选举请求消息;
+
+
+:获取当前的最后日志信息;
+if (未投票或收到更高任期的请求?) then (yes)
+    :更新当前任期;
+    :设置投票对象为candidateId;
+
+    :准备投票响应消息;
+    note right
+    投票同意
+    end note
+    :遍历其他节点;
+    if (找到候选人信息?) then (yes)
+        :发送响应到候选人;
+        :重置计时器;
+        :打印投票信息;
+    stop
+    else (no)
+    :丢弃信息;
+    endif
+    stop
+else (no)
+    :不投票;
+    stop
+endif
+@enduml

@@ -1,0 +1,48 @@
+@startuml
+start
+:反序列化消息;
+
+if (请求的任期 < 当前任期) then (yes)
+    :拒绝请求;
+    stop
+    else (no)
+    :重置计时器;
+    
+    if (请求的任期 > 当前任期) then (yes)
+        :更新当前任期;
+    endif
+    
+    if (请求的LeaderID != 本地LeaderID) then (yes)
+        :更新LeaderID;
+    endif
+
+    if (entries为空?) then (心跳检测)
+        :打印心跳检测信息;
+        if (prevLogIndex > 本地日志长度 或 最新日志不匹配) then (yes)
+        :构建并发送失败响应;
+        stop
+        else (no)
+        :继续监听;
+        stop
+        endif
+    else (日志追加)
+        :获取Leader地址;
+        if (prevLogIndex > 日志长度) then (yes)
+        :构建并发送失败响应;
+        stop
+        elseif (日志条目不匹配) then (yes)
+        :删除不匹配的日志;
+        :构建并发送失败响应;
+        stop
+        else (日志条目匹配)
+        :追加日志;
+        if (Leader的commitIndex > 本地的commitIndex) then (yes)
+            :更新commitIndex;
+            :应用提交;
+        endif
+        :构建并发送成功响应;
+        stop
+        endif
+    endif
+endif
+@enduml
